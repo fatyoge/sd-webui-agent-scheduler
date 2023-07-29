@@ -73,6 +73,28 @@ def on_task_finished(
 def regsiter_apis(app: App, task_runner: TaskRunner):
     log.info("[AgentScheduler] Registering APIs")
 
+    @app.post("/agent-scheduler/v1/queue/t2i_roop", response_model=QueueTaskResponse)
+    def queue_t2i_roop(body: Txt2ImgApiTaskArgs):
+        task_id = str(uuid4())
+        args = body.dict()
+        checkpoint = "majicmixRealistic_v6.safetensors [e4a30e4607]"
+        #callback_url = args.pop("callback_url", None)
+        callback_url = None
+        task = task_runner.register_api_task(
+            task_id,
+            api_task_id=None,
+            is_img2img=False,
+            args=args,
+            checkpoint=checkpoint,
+        )
+        if callback_url:
+            task.api_task_callback = callback_url
+            task_manager.update_task(task)
+
+        task_runner.execute_pending_tasks_threading()
+
+        return QueueTaskResponse(task_id=task_id)
+
     @app.post("/agent-scheduler/v1/queue/txt2img", response_model=QueueTaskResponse)
     def queue_txt2img(body: Txt2ImgApiTaskArgs):
         task_id = str(uuid4())
