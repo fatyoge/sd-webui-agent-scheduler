@@ -287,7 +287,10 @@ class TaskRunner:
         u = 0
         for arg in list(args):
             # if isinstance(arg, UiControlNetUnit):
-            if type(arg).__name__ == "UiControlNetUnit":
+            if (
+                arg is not None 
+                and type(arg).__name__ == "UiControlNetUnit"
+            ):
                 log.info("UiControlNetUnit Save")
                 pickle_dump(list(args)[108], 'CNetUnit{}.plk'.format(u))
                 u = u + 1
