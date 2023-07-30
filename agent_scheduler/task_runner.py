@@ -265,7 +265,7 @@ class TaskRunner:
         progress.add_task_to_queue(task_id)
 
         log.info("[register_ui_task] args:")
-        log.info(list(args))
+        log.info(args)
 
         (params, script_args) = self.__serialize_ui_task_args(
             is_img2img, *args, checkpoint=checkpoint, request=request
