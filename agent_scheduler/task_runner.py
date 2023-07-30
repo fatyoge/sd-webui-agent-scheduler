@@ -11,6 +11,24 @@ from typing import Any, Callable, Union, Optional, List, Dict, Tuple
 from fastapi import FastAPI
 from PIL import Image
 
+import pickle,os
+
+from sd-webui-controlnet.scripts.controlnet_ui.controlnet_ui_group import UiControlNetUnit
+
+def pickle_dump(obj, filename):
+    if os.path.exists(filename):
+        os.remove(filename)
+    if len(obj) > 0:
+        f = open(filename, 'wb')
+        pickle.dump(obj, f)
+        f.close()
+
+def pickle_load(filename):
+    f = open(filename, 'rb')
+    df = pickle.load(f)
+    f.close()
+    return df
+
 from modules import progress, shared, script_callbacks
 from modules.call_queue import queue_lock, wrap_gradio_call
 from modules.txt2img import txt2img
@@ -266,6 +284,14 @@ class TaskRunner:
 
         log.info("[register_ui_task] args:")
         log.info(list(args))
+
+        u = 0
+        for arg in list(args):
+            if isinstance(arg, UiControlNetUnit):
+                log.info("UiControlNetUnit Save")
+                pickle_dump(list(args)[108], 'CNetUnit{}.plk'.format(u))
+                u = u + 1
+
 
         (params, script_args) = self.__serialize_ui_task_args(
             is_img2img, *args, checkpoint=checkpoint, request=request

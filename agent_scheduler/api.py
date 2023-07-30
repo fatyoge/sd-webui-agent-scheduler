@@ -81,7 +81,8 @@ def regsiter_apis(app: App, task_runner: TaskRunner):
             im = Image.open(file.file)
             if im.mode in ("RGBA", "P"): 
                 im = im.convert("RGB")
-            im.save('cherry_0730.jpg', 'JPEG', quality=50) 
+            # im.save('cherry_0730.jpg', 'JPEG', quality=50) 
+            
             return 'got it'
         except Exception:
             raise HTTPException(status_code=500, detail='Something went wrong')
