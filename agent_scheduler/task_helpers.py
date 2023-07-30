@@ -293,6 +293,8 @@ def map_ui_task_args_list_to_named_args(
     else:
         args_name = inspect.getfullargspec(txt2img).args
 
+    log.info("[map_ui_task_args_list_to_named_args] args_name:")
+    log.info(args_name)
     # SD WebUI 1.5.0 has new request arg
     if "request" in args_name:
         args.insert(args_name.index("request"), None)
