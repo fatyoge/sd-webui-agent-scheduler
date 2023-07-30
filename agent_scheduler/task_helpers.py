@@ -302,6 +302,11 @@ def map_ui_task_args_list_to_named_args(
     named_args = dict(zip(args_name, args[0 : len(args_name)]))
     script_args = args[len(args_name) :]
 
+    log.info("[map_ui_task_args_list_to_named_args] named_args:")
+    log.info(named_args)
+    log.info("[map_ui_task_args_list_to_named_args] args_name:")
+    log.info(args_name)
+
     override_settings_texts: List[str] = named_args.get("override_settings_texts", [])
     # add clip_skip if not exist in args (vlad fork has this arg)
     if named_args.get("clip_skip", None) is None:
