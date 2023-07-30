@@ -13,7 +13,6 @@ from PIL import Image
 
 import pickle,os
 
-from sd-webui-controlnet.scripts.controlnet_ui.controlnet_ui_group import UiControlNetUnit
 
 def pickle_dump(obj, filename):
     if os.path.exists(filename):
@@ -287,7 +286,8 @@ class TaskRunner:
 
         u = 0
         for arg in list(args):
-            if isinstance(arg, UiControlNetUnit):
+            # if isinstance(arg, UiControlNetUnit):
+            if type(arg).__name__ == "UiControlNetUnit":
                 log.info("UiControlNetUnit Save")
                 pickle_dump(list(args)[108], 'CNetUnit{}.plk'.format(u))
                 u = u + 1
