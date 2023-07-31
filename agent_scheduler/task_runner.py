@@ -17,10 +17,9 @@ import pickle,os
 def pickle_dump(obj, filename):
     if os.path.exists(filename):
         os.remove(filename)
-    if len(obj) > 0:
-        f = open(filename, 'wb')
-        pickle.dump(obj, f)
-        f.close()
+    f = open(filename, 'wb')
+    pickle.dump(obj, f)
+    f.close()
 
 def pickle_load(filename):
     f = open(filename, 'rb')
