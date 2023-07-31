@@ -292,8 +292,9 @@ class TaskRunner:
                 and type(arg).__name__ == "UiControlNetUnit"
             ):
                 log.info("UiControlNetUnit Save")
-                pickle_dump(list(args)[108], 'CNetUnit{}.plk'.format(u))
+                pickle_dump(arg, 'CNetUnit{}.plk'.format(u))
                 u = u + 1
+                log.info('CNetUnit{}.plk'.format(u))
 
 
         (params, script_args) = self.__serialize_ui_task_args(
