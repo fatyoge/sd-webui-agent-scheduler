@@ -134,11 +134,8 @@ class TaskRunner:
             list(args), is_img2img
         )
 
-        log.info("[__serialize_ui_task_args] named_args:")
-        log.info(named_args)
-        log.info("[__serialize_ui_task_args] script_args:")
-        log.info(script_args)
-
+        # log.info("[__serialize_ui_task_args] named_args:")
+        # log.info(named_args)
         # loop through named_args and serialize images
         if is_img2img:
             serialize_img2img_image_args(named_args)
@@ -154,10 +151,23 @@ class TaskRunner:
                 "is_img2img": is_img2img,
             }
         )
-        script_params = serialize_script_args(script_args)
-
+        
         log.info("[__serialize_ui_task_args] params:")
         log.info(params)
+
+        log.info("[__serialize_ui_task_args] script_args:")
+        log.info(script_args)
+
+        # pickle file
+        script_params = serialize_script_args(script_args)
+
+        log.info("params Save")
+        pickle_dump(params, 'params_json.plk')
+        log.info("script_args Save")
+        pickle_dump(script_args, 'script_args_list.plk')
+
+        # log.info("[__serialize_ui_task_args] params:")
+        # log.info(params)
         # this pickle object
         # log.info("[__serialize_ui_task_args] script_params:")
         # log.info(script_params)
@@ -291,20 +301,20 @@ class TaskRunner:
     ):
         progress.add_task_to_queue(task_id)
 
-        log.info("[register_ui_task] args:")
-        log.info(list(args))
+        # log.info("[register_ui_task] args:")
+        # log.info(list(args))
 
-        u = 0
-        for arg in list(args):
-            # if isinstance(arg, UiControlNetUnit):
-            if (
-                arg is not None 
-                and type(arg).__name__ == "UiControlNetUnit"
-            ):
-                log.info("UiControlNetUnit Save")
-                pickle_dump(arg, 'CNetUnit{}.plk'.format(u))
-                u = u + 1
-                log.info('CNetUnit{}.plk'.format(u))
+        # u = 0
+        # for arg in list(args):
+        #     # if isinstance(arg, UiControlNetUnit):
+        #     if (
+        #         arg is not None 
+        #         and type(arg).__name__ == "UiControlNetUnit"
+        #     ):
+        #         log.info("UiControlNetUnit Save")
+        #         pickle_dump(arg, 'CNetUnit{}.plk'.format(u))
+        #         u = u + 1
+        #         log.info('CNetUnit{}.plk'.format(u))
 
 
         (params, script_args) = self.__serialize_ui_task_args(
@@ -351,7 +361,7 @@ class TaskRunner:
             params=params,
             script_params=script_params,
         )
-        
+
         task_manager.add_task(task)
 
         self.__run_callbacks(
