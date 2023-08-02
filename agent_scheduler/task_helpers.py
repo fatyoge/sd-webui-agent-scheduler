@@ -256,6 +256,8 @@ def serialize_script_args(script_args: List):
         if type(a).__name__ == "UiControlNetUnit":
             script_args[i] = serialize_controlnet_args(a)
 
+    log.info("[serialize_script_args] script_args:")
+    log.info(script_args)
     return zlib.compress(pickle.dumps(script_args))
 
 

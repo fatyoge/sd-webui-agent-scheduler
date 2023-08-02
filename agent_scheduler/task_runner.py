@@ -134,6 +134,11 @@ class TaskRunner:
             list(args), is_img2img
         )
 
+        log.info("[__serialize_ui_task_args] named_args:")
+        log.info(named_args)
+        log.info("[__serialize_ui_task_args] script_args:")
+        log.info(script_args)
+
         # loop through named_args and serialize images
         if is_img2img:
             serialize_img2img_image_args(named_args)
@@ -150,6 +155,11 @@ class TaskRunner:
             }
         )
         script_params = serialize_script_args(script_args)
+        
+        log.info("[__serialize_ui_task_args] params:")
+        log.info(params)
+        log.info("[__serialize_ui_task_args] script_params:")
+        log.info(script_params)
 
         return (params, script_params)
 
