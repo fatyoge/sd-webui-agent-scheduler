@@ -12,6 +12,7 @@ from gradio.routes import App
 from PIL import Image
 from fastapi.responses import StreamingResponse
 
+import numpy as np
 from modules import shared, progress
 
 from .db import Task, TaskStatus, task_manager
@@ -77,12 +78,33 @@ def regsiter_apis(app: App, task_runner: TaskRunner):
 
     @app.post("/agent-scheduler/v1/queue/t2i_roop_file")
     async def t2i_roop_file(file: UploadFile = File()):
+        task_id = str(uuid4())
+        checkpoint = "majicmixRealistic_v6.safetensors [e4a30e4607]"
+        #callback_url = args.pop("callback_url", None)
+        callback_url = None
         try:
-            im = Image.open(file.file)
-            if im.mode in ("RGBA", "P"): 
-                im = im.convert("RGB")
-            im.save('cherry_0730.jpg', 'JPEG', quality=50) 
-            return 'got it'
+            img_file = file.file
+            im = Image.open(img_file).convert("RGB")
+            img_array = np.array(im)
+
+            params = {"args": {"id_task": "task(tstpbcgnzxz2vyo)", "prompt": "(photo-realistic:1.3),(hyperdetailed:1.2),best quality,realistic,photograph,1girl,full body,cute & girly (idolmaster),outdoors,sunlight,magazine scan,wearing glasses, smile,\n", "negative_prompt": "ng_deepnegative_v1_75t, (badhandv4:1.3), (worst quality:2), (low quality:2), (normal quality:2),lowres, bad anatomy, bad hands, ((monochrome)), ((grayscale)) ,watermark", "prompt_styles": [], "steps": 30, "sampler_index": 17, "restore_faces": false, "tiling": false, "n_iter": 1, "batch_size": 1, "cfg_scale": 7, "seed": -1.0, "subseed": -1.0, "subseed_strength": 0, "seed_resize_from_h": 0, "seed_resize_from_w": 0, "seed_enable_extras": false, "height": 1024, "width": 768, "enable_hr": false, "denoising_strength": 0.7, "hr_scale": 2, "hr_upscaler": "Latent", "hr_second_pass_steps": 0, "hr_resize_x": 0, "hr_resize_y": 0, "hr_sampler_index": 0, "hr_prompt": "", "hr_negative_prompt": "", "override_settings_texts": ["Clip skip: 1"], "request": {"username": null}, "sampler_name": "DPM++ SDE Karras"}, "checkpoint": "majicmixRealistic_v6.safetensors [e4a30e4607]", "is_ui": true, "is_img2img": false}
+            script_args = []
+            task = task_runner.register_api_task_raw(
+                task_id,
+                api_task_id=None,
+                is_img2img=False,
+                params=params,
+                script_args=script_args,
+            )
+            if callback_url:
+                task.api_task_callback = callback_url
+                task_manager.update_task(task)
+
+            task_runner.execute_pending_tasks_threading()
+
+            return QueueTaskResponse(task_id=task_id)
+            # im.save('cherry_0730.jpg', 'JPEG', quality=50) 
+            # return 'got it'
         except Exception:
             raise HTTPException(status_code=500, detail='Something went wrong')
         finally:
