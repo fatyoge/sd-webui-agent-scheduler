@@ -338,13 +338,57 @@ class TaskRunner:
 
         return task
 
+    def register_ui_task_raw(
+        self,
+        task_id: str,
+        is_img2img: bool,
+        params: json,
+        script_args: List,
+        checkpoint: str = None,
+        task_name: str = None,
+        request: gr.Request = None,
+    ):
+        progress.add_task_to_queue(task_id)
+
+        # (params, script_args) = self.__serialize_ui_task_args(
+        #     is_img2img, *args, checkpoint=checkpoint, request=request
+        # )
+
+        # params = json.dumps(
+        #     {
+        #         "args": named_args,
+        #         "checkpoint": checkpoint,
+        #         "is_ui": True,
+        #         "is_img2img": is_img2img,
+        #     }
+        # )
+
+        script_params = serialize_script_args(script_args)
+
+        task_type = "img2img" if is_img2img else "txt2img"
+        task = Task(
+            id=task_id,
+            name=task_name,
+            type=task_type,
+            params=params,
+            script_params=script_params,
+        )
+        task_manager.add_task(task)
+
+        self.__run_callbacks(
+            "task_registered", task_id, is_img2img=is_img2img, is_ui=True, args=params
+        )
+        self.__total_pending_tasks += 1
+
+        return task
+    
     def register_api_task_raw(
         self,
         task_id: str,
         api_task_id: str,
         is_img2img: bool,
         params: json,
-        script_args,
+        script_args: List,
     ):
         progress.add_task_to_queue(task_id)
 

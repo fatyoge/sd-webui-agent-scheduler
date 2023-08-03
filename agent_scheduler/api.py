@@ -84,14 +84,172 @@ def regsiter_apis(app: App, task_runner: TaskRunner):
         callback_url = None
         try:
             img_file = file.file
+            # 将文件转换为
             im = Image.open(img_file).convert("RGB")
             img_array = np.array(im)
+            
+            w, h, d = img_array.shape
+            mask_array = np.full((w, h, 4), [0, 0, 0, 255], np.uint8)
 
-            params = {"args": {"id_task": "task(tstpbcgnzxz2vyo)", "prompt": "(photo-realistic:1.3),(hyperdetailed:1.2),best quality,realistic,photograph,1girl,full body,cute & girly (idolmaster),outdoors,sunlight,magazine scan,wearing glasses, smile,\n", "negative_prompt": "ng_deepnegative_v1_75t, (badhandv4:1.3), (worst quality:2), (low quality:2), (normal quality:2),lowres, bad anatomy, bad hands, ((monochrome)), ((grayscale)) ,watermark", "prompt_styles": [], "steps": 30, "sampler_index": 17, "restore_faces": false, "tiling": false, "n_iter": 1, "batch_size": 1, "cfg_scale": 7, "seed": -1.0, "subseed": -1.0, "subseed_strength": 0, "seed_resize_from_h": 0, "seed_resize_from_w": 0, "seed_enable_extras": false, "height": 1024, "width": 768, "enable_hr": false, "denoising_strength": 0.7, "hr_scale": 2, "hr_upscaler": "Latent", "hr_second_pass_steps": 0, "hr_resize_x": 0, "hr_resize_y": 0, "hr_sampler_index": 0, "hr_prompt": "", "hr_negative_prompt": "", "override_settings_texts": ["Clip skip: 1"], "request": {"username": null}, "sampler_name": "DPM++ SDE Karras"}, "checkpoint": "majicmixRealistic_v6.safetensors [e4a30e4607]", "is_ui": true, "is_img2img": false}
-            script_args = []
-            task = task_runner.register_api_task_raw(
+            named_args = {
+                    'prompt': '(photo-realistic:1.3),(hyperdetailed:1.2),best quality,realistic,photograph,1girl,full body,cute & girly (idolmaster),outdoors,sunlight,magazine scan,wearing glasses, smile,\n',
+                    'negative_prompt': 'ng_deepnegative_v1_75t, (badhandv4:1.3), (worst quality:2), (low quality:2), (normal quality:2),lowres, bad anatomy, bad hands, ((monochrome)), ((grayscale)) ,watermark',
+                    'prompt_styles': [],
+                    'steps': 30,
+                    'sampler_index': 17,
+                    'restore_faces': False,
+                    'tiling': False,
+                    'n_iter': 1,
+                    'batch_size': 1,
+                    'cfg_scale': 7,
+                    'seed': -1.0,
+                    'subseed': -1.0,
+                    'subseed_strength': 0,
+                    'seed_resize_from_h': 0,
+                    'seed_resize_from_w': 0,
+                    'seed_enable_extras': False,
+                    'height': 1024,
+                    'width': 768,
+                    'enable_hr': False,
+                    'denoising_strength': 0.7,
+                    'hr_scale': 2,
+                    'hr_upscaler': 'Latent',
+                    'hr_second_pass_steps': 0,
+                    'hr_resize_x': 0,
+                    'hr_resize_y': 0,
+                    'hr_sampler_index': 0,
+                    'hr_prompt': '',
+                    'hr_negative_prompt': '',
+                    'override_settings_texts': ['Clip skip: 1'],
+                    'request': {'username': None},
+                    'sampler_name': 'DPM++ SDE Karras'
+                    }
+            
+            unet0_args = {'is_cnet': True,
+                'enabled': True,
+                'module': 'openpose_face',
+                'model': 'control_v11p_sd15_openpose_fp16 [73c2b67d]',
+                'weight': 1,
+                'image': {'image': img_array, 'mask': mask_array},
+                'resize_mode': 'Crop and Resize',
+                'low_vram': False,
+                'processor_res': 512,
+                'threshold_a': -1,
+                'threshold_b': -1,
+                'guidance_start': 0,
+                'guidance_end': 1,
+                'pixel_perfect': True,
+                'control_mode': 'Balanced',
+                'is_ui': True,
+                'input_mode': 'simple',
+                'batch_images': '',
+                'output_dir': '',
+                'loopback': False}
+            
+            unet1_args = {
+                'is_cnet': True,
+                'enabled': False,
+                'module': 'none',
+                'model': 'None',
+                'weight': 1.0,
+                'image': None,
+                'resize_mode': 'Crop and Resize',
+                'low_vram': False,
+                'processor_res': -1,
+                'threshold_a': -1,
+                'threshold_b': -1,
+                'guidance_start': 0.0,
+                'guidance_end': 1.0,
+                'pixel_perfect': False,
+                'control_mode': 'Balanced',
+                'is_ui': True,
+                'input_mode': 'simple',
+                'batch_images': None,
+                'output_dir': '',
+                'loopback': False
+                }
+            
+            params = json.dumps(
+                {
+                    "args": named_args,
+                    "checkpoint": checkpoint,
+                    "is_ui": True,
+                    "is_img2img": False,
+                }
+            )
+            script_args = [0,
+                False,
+                {},
+                {},
+                False,
+                True,
+                False,
+                0,
+                -1,
+                False,
+                '',
+                0,
+                im , # 这里是roop的PIL Image
+                True,
+                '0',
+                '/home/ubuntu/stable-diffusion-webui/models/roop/inswapper_128.onnx',
+                'GFPGAN',
+                1,
+                'R-ESRGAN 4x+',
+                1,
+                1,
+                False,
+                True,
+                True,
+                False,
+                1,
+                False,
+                False,
+                False,
+                1.1,
+                1.5,
+                100,
+                0.7,
+                False,
+                False,
+                True,
+                False,
+                False,
+                0,
+                'Gustavosta/MagicPrompt-Stable-Diffusion',
+                '',
+                False,
+                False,
+                'LoRA',
+                'None',
+                0,
+                0,
+                'LoRA',
+                'None',
+                0,
+                0,
+                'LoRA',
+                'None',
+                0,
+                0,
+                'LoRA',
+                'None',
+                0,
+                0,
+                'LoRA',
+                'None',
+                0,
+                0,
+                None,
+                'Refresh models']
+            
+            # 添加controlnet
+            script_args.extend([unet0_args, unet1_args, unet1_args])
+
+            script_args.extend([False, False, 0, None, [], 0, False, [], [], False, 0, 1, False, False, 0, None, [], -2, False, [], False, 0, None, None, False, '1:1,1:2,1:2', '0:0,0:0,0:1', '0.2,0.8,0.8', 150, 0.2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, False, False, 'positive', 'comma', 0, False, False, '', 1, '', [], 0, '', [], 0, '', [], True, False, False, False, 0, None, None, False, None, None, False, None, None, False, 50])
+            
+            task = task_runner.register_ui_task_raw(
                 task_id,
-                api_task_id=None,
                 is_img2img=False,
                 params=params,
                 script_args=script_args,
