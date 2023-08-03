@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Optional, Dict
 from gradio.routes import App
 from PIL import Image
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, FileResponse
 
 import numpy as np
 from modules import shared, progress
@@ -76,7 +76,7 @@ def regsiter_apis(app: App, task_runner: TaskRunner):
     log.info("[AgentScheduler] Registering APIs")
 
 
-    @app.post("/agent-scheduler/v1/queue/t2i_roop_file")
+    @app.post("/agent-scheduler/v1/queue/t2i_roop_file", response_model=QueueTaskResponse)
     async def t2i_roop_file(file: UploadFile = File()):
         task_id = str(uuid4())
         checkpoint = "majicmixRealistic_v6.safetensors [e4a30e4607]"
